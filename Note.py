@@ -5,15 +5,8 @@ class Note:
     self.time = time
     self.alter = alter
 
+  # prints out the xml encoding for the note
   def printNote(self):
-                #<note>
-      #<pitch>
-        #<step>A|B|C|D|E|F|G</step>
-        #<alter>-1|1</alter>
-        #<octave>1-8</octave>
-      #<duration>1,2,4,8,16
-      #<voice>1</
-      #<type>quarter|eighth|16th
     output = "<note>\n" + \
                "\t<pitch>\n" + \
                  "\t\t<step>" + str(self.note) + "</step>\n"
