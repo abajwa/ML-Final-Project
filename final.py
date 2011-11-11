@@ -63,15 +63,19 @@ def getTimeSignature(f):
   
 def readFile(f):
   noteList = []
-  i = 0
+  i = 114
 
+  part = []
   # reads through the whole file
   while i < len(f):
-
       # while not at the end of the file and the keyword note is not found, increment the line number
       while i < len(f) and not 'note' in f[i]:
           i += 1
-
+          # if the part id changes then append the previous to the list
+          if i < len(f) and 'part id' in f[i]:
+            noteList.append(part)
+            part = []
+        
       # attributes for each note
       step = ""
       alter = 0
@@ -97,7 +101,8 @@ def readFile(f):
       i = i+1
       # add the note to the list of notes
       if i < len(f):
-          noteList.append(Note(step, octave, time, alter))
+          part.append(Note(step, octave, time, alter))
+  noteList.append(part)
   return noteList
 
 
@@ -109,10 +114,11 @@ print ts
 
 notes = readFile(f)
 
-print len(notes)
-
-print notes[len(notes)-1].printNote()
-
+print len(notes[0])
+print len(notes[1])
+print len(notes[2])
+print len(notes[3])
+print len(notes[4])
 
 #nl = readFile(f)
 
