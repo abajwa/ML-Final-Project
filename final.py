@@ -98,6 +98,64 @@ def writeTop(f):
     i += 1
     
   f.write('\t</part-list>\n')
+
+
+# writes a whole song to an xml file given the file and a list of notes
+def writeSong(f, notes):
+  writeTop(f)
+
+  measureNumber = 1
+  measureCompletion = 0
+  partNumber = 1
+  newMeasure = 1
+  # for each part
+  for part in notes:
+    f.write('\t<part id ="P' + str(partNumber) + '">\n')
+    measureNumber = 1
+    f.write( '\t\t<measure number="0">\n' + \
+                '\t\t\t<attributes>\n' + \
+                  '\t\t\t\t<divisions>4</divisions>\n' + \
+                  '\t\t\t\t<key>\n' + \
+                    '\t\t\t\t\t<fifths>-1</fifths>\n' + \
+                    '\t\t\t\t\t<mode>major</mode>\n' + \
+                  '\t\t\t\t</key>\n' + \
+                  '\t\t\t\t<time symbol="common">\n' + \
+                    '\t\t\t\t\t<beats>4</beats>\n' + \
+                    '\t\t\t\t\t<beat-type>4</beat-type>\n' + \
+                  '\t\t\t\t</time>\n' + \
+             '\t\t\t</attributes>\n' + \
+             '\t\t\t<sound tempo="76"/>\n' + \
+           '\t\t</measure>\n')
+
+    measureNumber = 1
+    measureCompletion = 0
+    newMeasure = 1
+  
+    for note in part:
+      # a measure is complete when the note count = 1
+      if measureCompletion == 1:
+        f.write('\t\t</measure>\n')
+        measureCompletion = 0
+        measureNumber += 1
+        newMeasure = 1
+      if newMeasure == 1:
+        f.write('\t\t<!--=======================================================-->\n')
+        f.write('\t\t<measure number="' + str(measureNumber) + '">\n')
+        newMeasure = 0
+
+      f.write(note.printNote() + '\n')
+
+      # adds to the measure completion depending on the note type
+      if 'quarter' in note.time:
+        measureCompletion += 0.25
+      elif 'eighth' in note.time:
+        measureCompletion += 0.125
+      elif '16th' in note.time:
+        measureCompletion += 0.0625
+    f.write('\t\t</part>\n')
+    partNumber += 1
+  f.write('\t</measure>\n')
+  f.write('</score-partwise>')
   
 def readFile(f):
   noteList = []
@@ -167,8 +225,6 @@ notes = readFile(f)
 probMat = makeNoteMatrix(notes)
 
 fi = open('test.xml', 'w')
-writeTop(fi)
+writeSong(fi, notes)
 
 fi.close()
-
-#</score-partwise>

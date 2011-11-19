@@ -7,21 +7,21 @@ class Note:
 
   # prints out the xml encoding for the note
   def printNote(self):
-    output = "<note>\n"
+    output = "\t\t\t<note>\n"
 
     if 'R' in str(self.note):
-      output += "\t<rest/>\n"
+      output += "\t\t\t\t<rest/>\n"
     else:
-      output += "\t<pitch>\n" + \
-                 "\t\t<step>" + str(self.note) + "</step>\n"
+      output += "\t\t\t\t<pitch>\n" + \
+                 "\t\t\t\t\t<step>" + str(self.note) + "</step>\n"
       if self.alter != 0:
-        output += "\t\t<alter>" + str(self.alter) + "</alter>\n"
+        output += "\t\t\t\t\t<alter>" + str(self.alter) + "</alter>\n"
 
-      output +=   "\t\t<octave>" + str(self.octave) + "</octave>\n" + \
-                "\t</pitch>\n"
+      output +=   "\t\t\t\t\t<octave>" + str(self.octave) + "</octave>\n" + \
+                "\t\t\t\t</pitch>\n"
 
-    output +="\t<voice>1</voice>\n" + \
-              "\t<type>" + str(self.time) + "</type>\n" + \
-              "</note>"
+    output +="\t\t\t\t<voice>1</voice>\n" + \
+              "\t\t\t\t<type>" + str(self.time) + "</type>\n" + \
+              "\t\t\t</note>\n"
                                 
     return output
