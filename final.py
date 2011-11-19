@@ -78,19 +78,24 @@ def getTimeSignature(f):
   
 def readFile(f):
   noteList = []
-  i = 114
+  i = 0
+
+  # finds where the first part starts - skips all the other part id stuff at the beginning of the xml file
+  while i < len(f) and not '<part id=' in f[i]:
+    i += 1
 
   part = []
   # reads through the whole file
   while i < len(f):
+      
       # while not at the end of the file and the keyword note is not found, increment the line number
       while i < len(f) and not 'note' in f[i]:
           i += 1
           # if the part id changes then append the previous to the list
-          if i < len(f) and 'part id' in f[i]:
+          if i < len(f) and '<part id=\"' in f[i]:
             noteList.append(part)
             part = []
-                
+
       # attributes for each note
       step = "R"
       alter = 0
@@ -129,11 +134,11 @@ ts = getTimeSignature(f)
 
 notes = readFile(f)
 
-#print len(notes[0])
-#print len(notes[1])
-#print len(notes[2])
-#print len(notes[3])
-#print len(notes[4])
+print len(notes[0])
+print len(notes[1])
+print len(notes[2])
+print len(notes[3])
+print len(notes[4])
 
 #print notes[1][46].note
 
