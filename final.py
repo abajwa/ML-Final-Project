@@ -74,6 +74,9 @@ def getTimeSignature(f):
     
   return [beats, beatType]
 
+def writeTop(f):
+	f.write('<score-partwise>\n')
+	
 
   
 def readFile(f):
@@ -140,12 +143,6 @@ print len(notes[2])
 print len(notes[3])
 print len(notes[4])
 
-#print notes[1][46].note
-
-print notes[1][46].printNote()
-
-makeNoteMatrix(notes)
-#nl = readFile(f)
-
+probMat = makeNoteMatrix(notes)
 
 #</score-partwise>
