@@ -75,9 +75,29 @@ def getTimeSignature(f):
   return [beats, beatType]
 
 def writeTop(f):
-	f.write('<score-partwise>\n')
-	
+  # list of the labels of each part in the midi file
+  parts = ["Soprano", "Alto", "Tenor", "Bass"]
 
+  # prints out the data for each part
+  f.write('<score-partwise>\n' + \
+            '\t<part-list>\n');
+
+  i = 1
+  for part in parts:
+    f.write('\t\t<score-part id="P' + str(i) + '">\n' \
+              '\t\t\t<part-name>' + part + '</part-name>\n' + \
+              '\t\t\t<part-abbreviation>' + part[0] + '</part-abbreviation>\n' + \
+              '\t\t\t<score-instrument id="P' + str(i) + '-I' + str(i) + '">\n' + \
+                '\t\t\t\t<instrument-name>Instrument ' + str(i) + '</instrument-name>\n' + \
+              '\t\t\t</score-instrument>\n' + \
+              '\t\t\t<midi-instrument id="P' + str(i) + '-I' + str(i) + '">\n' + \
+                '\t\t\t\t<midi-channel>' + str(i) + '</midi-channel>\n' + \
+                '\t\t\t\t<midi-program>1</midi-program>\n' + \
+              '\t\t\t</midi-instrument>\n' + \
+            '\t\t</score-part>\n')
+    i += 1
+    
+  f.write('\t</part-list>\n')
   
 def readFile(f):
   noteList = []
@@ -137,12 +157,18 @@ ts = getTimeSignature(f)
 
 notes = readFile(f)
 
-print len(notes[0])
-print len(notes[1])
-print len(notes[2])
-print len(notes[3])
-print len(notes[4])
+# prints the number of notes in each part
+#print len(notes[0])
+#print len(notes[1])
+#print len(notes[2])
+#print len(notes[3])
+#print len(notes[4])
 
 probMat = makeNoteMatrix(notes)
+
+fi = open('test.xml', 'w')
+writeTop(fi)
+
+fi.close()
 
 #</score-partwise>

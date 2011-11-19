@@ -1,0 +1,47 @@
+<score-partwise>
+	<part-list>
+		<score-part id="P1">
+			<part-name>Soprano</part-name>
+			<part-abbreviation>S</part-abbreviation>
+			<score-instrument id="P1-I1">
+				<instrument-name>Instrument 1</instrument-name>
+			</score-instrument>
+			<midi-instrument id="P1-I1">
+				<midi-channel>1</midi-channel>
+				<midi-program>1</midi-program>
+			</midi-instrument>
+		</score-part>
+		<score-part id="P2">
+			<part-name>Alto</part-name>
+			<part-abbreviation>A</part-abbreviation>
+			<score-instrument id="P2-I2">
+				<instrument-name>Instrument 2</instrument-name>
+			</score-instrument>
+			<midi-instrument id="P2-I2">
+				<midi-channel>2</midi-channel>
+				<midi-program>1</midi-program>
+			</midi-instrument>
+		</score-part>
+		<score-part id="P3">
+			<part-name>Tenor</part-name>
+			<part-abbreviation>T</part-abbreviation>
+			<score-instrument id="P3-I3">
+				<instrument-name>Instrument 3</instrument-name>
+			</score-instrument>
+			<midi-instrument id="P3-I3">
+				<midi-channel>3</midi-channel>
+				<midi-program>1</midi-program>
+			</midi-instrument>
+		</score-part>
+		<score-part id="P4">
+			<part-name>Bass</part-name>
+			<part-abbreviation>B</part-abbreviation>
+			<score-instrument id="P4-I4">
+				<instrument-name>Instrument 4</instrument-name>
+			</score-instrument>
+			<midi-instrument id="P4-I4">
+				<midi-channel>4</midi-channel>
+				<midi-program>1</midi-program>
+			</midi-instrument>
+		</score-part>
+	</part-list>
