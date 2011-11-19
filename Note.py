@@ -9,8 +9,8 @@ class Note:
   def printNote(self):
     output = "<note>\n"
 
-    if self.octave != 0:
-      output += "\t<rest/>"
+    if 'R' in str(self.note):
+      output += "\t<rest/>\n"
     else:
       output += "\t<pitch>\n" + \
                  "\t\t<step>" + str(self.note) + "</step>\n"
