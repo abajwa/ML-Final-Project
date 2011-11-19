@@ -27,26 +27,41 @@ from Note import *
       #<voice>1</
       #<type>quarter|eighth|16th
 
-def makeNoteMatrix():
-  return [ [0 for i in range(0,57)] for j in range(0,57) ]
+def makeNoteMatrix(parts):
+  nm = [ [0 for i in range(0,57)] for j in range(0,57) ]
+  noteCount = [0 for i in range(0,57)]
+  for part in parts:
+  	nm[0][noteIndex(part[0].note,part[0].octave)] = nm[0][noteIndex(part[0].note,part[0].octave)] + 1
+  	noteCount[0] = noteCount[0] + 1
+  	for i in range(1,len(part)):
+  		nm[noteIndex(part[i-1].note,part[i-1].octave)][noteIndex(part[i].note,part[i].octave)] = nm[noteIndex(part[i-1].note,part[i-1].octave)][noteIndex(part[i].note,part[i].octave)] + 1
+  		noteCount[noteIndex(part[i].note,part[i].octave)] = noteCount[noteIndex(part[i].note,part[i].octave)] + 1
+  numNotes = sum(noteCount)
+  for i in range(0,57):
+  	for j in range(0,57):
+  		if noteCount[i] != 0:
+	  		nm[i][j] = float(nm[i][j])/noteCount[i]
+  		if j != 0:
+  			nm[i][j] = nm[i][j-1] + nm[i][j]
+  return nm
 
 def noteIndex(note, octave):
-  if note == 'rest':
+  if note == 'R':
     return 0
   elif note == 'A':
-    return 1 + (octave-1)*7
+    return 1 + (int(octave)-1)*7
   elif note == 'B':
-    return 2 + (octave-1)*7
+    return 2 + (int(octave)-1)*7
   elif note == 'C':
-    return 3 + (octave-1)*7
+    return 3 + (int(octave)-1)*7
   elif note == 'D':
-    return 4 + (octave-1)*7
+    return 4 + (int(octave)-1)*7
   elif note == 'E':
-    return 5 + (octave-1)*7
+    return 5 + (int(octave)-1)*7
   elif note == 'F':
-    return 6 + (octave-1)*7
+    return 6 + (int(octave)-1)*7
   elif note == 'G':
-    return 7 + (octave-1)*7
+    return 7 + (int(octave)-1)*7
 
 def getTimeSignature(f):
   i=0
@@ -123,6 +138,8 @@ notes = readFile(f)
 #print notes[1][46].note
 
 print notes[1][46].printNote()
+
+makeNoteMatrix(notes)
 #nl = readFile(f)
 
 
