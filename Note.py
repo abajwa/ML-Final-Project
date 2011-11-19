@@ -9,7 +9,7 @@ class Note:
   def printNote(self):
     output = "<note>\n"
 
-    if octave != 0:
+    if self.octave != 0:
       output += "\t<rest/>"
     else:
       output += "\t<pitch>\n" + \

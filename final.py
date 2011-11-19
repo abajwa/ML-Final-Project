@@ -95,7 +95,7 @@ def readFile(f):
       step = "R"
       alter = 0
       octave = 0
-      time = ''
+      time = 'quarter'
       duration = 0
       
       # get the above attributes for each note while /note is not yet encountered
