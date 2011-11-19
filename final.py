@@ -90,7 +90,7 @@ def readFile(f):
           if i < len(f) and 'part id' in f[i]:
             noteList.append(part)
             part = []
-        
+                
       # attributes for each note
       step = "R"
       alter = 0
@@ -125,18 +125,21 @@ f = open('blah.xml').readlines()
 
 ts = getTimeSignature(f)
 
-print ts
+#print ts
 
 notes = readFile(f)
 
-print len(notes[0])
-print len(notes[1])
-print len(notes[2])
-print len(notes[3])
-print len(notes[4])
+#print len(notes[0])
+#print len(notes[1])
+#print len(notes[2])
+#print len(notes[3])
+#print len(notes[4])
+
+#print notes[1][46].note
+
+print notes[1][46].printNote()
 
 makeNoteMatrix(notes)
-
 #nl = readFile(f)
 
 
