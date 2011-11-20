@@ -1,4 +1,7 @@
-from music21 import *
+#from music21 import *
+from Score import *
+from Part import *
+from Measure import *
 from Note import *
 
 #<score-partwise>
@@ -26,7 +29,7 @@ from Note import *
       #<duration>1,2,4,8,16
       #<voice>1</
       #<type>quarter|eighth|16th
-
+'''
 def makeNoteMatrix(parts):
   nm = [ [0 for i in range(0,57)] for j in range(0,57) ]
   noteCount = [0 for i in range(0,57)]
@@ -44,7 +47,7 @@ def makeNoteMatrix(parts):
   		if j != 0:
   			nm[i][j] = nm[i][j-1] + nm[i][j]
   return nm
-
+'''
 def noteIndex(note, octave):
   if note == 'R':
     return 0
@@ -161,55 +164,78 @@ def writeSong(f, notes):
     f.write('\t</part>\n')
     partNumber += 1
   f.write('</score-partwise>')
-  
+
+
 def readFile(f):
-  noteList = []
+  partsList = []
   i = 0
+  partNum = 1
   
-  # finds where the first part starts - skips all the other part id stuff at the beginning of the xml file
-  while i < len(f) and not '<part id=' in f[i]:
+  while i < len(f) and '<part id=\"' not in f[i]:
+    # finds the parts
+    if '<score-part id=' in f[i]:
+      # finds the name of the part
+      while i < len(f) and '<part-name>' not in f[i]:
+        i += 1
+      partName = f[i].split('>')[1].split('<')[0]
+      # create a part at this point
+      partsList.append(Part(partNum, partName , []))
+      partNum += 1
+      
     i += 1
 
-  part = []
-  # reads through the whole file
-  while i < len(f):
-      
-      # while not at the end of the file and the keyword note is not found, increment the line number
-      while i < len(f) and not 'note' in f[i]:
-          i += 1
-          # if the part id changes then append the previous to the list
-          if i < len(f) and '<part id=\"' in f[i]:
-            noteList.append(part)
-            part = []
 
-      # attributes for each note
-      step = "R"
-      alter = 0
-      octave = 0
-      time = 'quarter'
-      duration = 0
-      
-      # get the above attributes for each note while /note is not yet encountered
-      while i < len(f) -1 and not '/note' in f[i]:
-          i += 1
-          if '<step' in f[i]:
+  # at this point i contains the line number of the first part id
+  partNum = 1
+  i += 1
+  measureNumber = 0
+  while i < len(f):
+    if '<part id=\"' in f[i]:
+      partNum += 1
+      measureNumber = 0
+
+    if '<measure' in f[i]:
+      # create a new measure
+      partsList[partNum-1].addMeasure(Measure(measureNumber, []))
+
+      # while it is still in the same measure
+      while i < len(f) and not '/measure' in f[i]:
+        if '<note' in f[i]:
+          # create a new note
+          step = "R"
+          alter = 0
+          octave = 0
+          time = 'quarter'
+          duration = 0
+
+          while i < len(f) -1 and not '/note' in f[i]:
+            i += 1
+            if '<step' in f[i]:
               step = f[i].split('>')[1].split('<')[0]
-          elif '<alter' in f[i]:
+            elif '<alter' in f[i]:
               alter = f[i].split('>')[1].split('<')[0]
-          elif '<octave' in f[i]:
+            elif '<octave' in f[i]:
               octave = f[i].split('>')[1].split('<')[0]
-          elif '<type' in f[i]:
+            elif '<type' in f[i]:
               time = f[i].split('>')[1].split('<')[0]
-          elif '<duration' in f[i]:
+            elif '<duration' in f[i]:
               duration = f[i].split('>')[1].split('<')[0]
-      # increment the row number one more time to skip the /note line since it is the current
-      # line at this point
-      i = i+1
-      # add the note to the list of notes
-      if i < len(f):
-          part.append(Note(step, octave, time, duration, alter))
-  noteList.append(part)
-  return noteList
+          # /note has been found at this point
+          # create the note and add it to the measure
+          partsList[partNum-1].measures[measureNumber].addNote(Note(step, octave, time, duration, alter))
+        i += 1
+      measureNumber += 1
+      
+    i += 1
+
+#  print i
+#  print "PART NUM: " + str(partNum)
+
+#  print "Measures in part 1: " + str(len(partsList[0].measures))
+#  print "Notes in part 2 measure 1: " + str(len(partsList[4].measures[20].notes))
+  #print partsList[0].measures[0].notes[0].printNote()
+
+  return Score(partsList)
 
 
 f = open('blah.xml').readlines()
@@ -227,12 +253,12 @@ notes = readFile(f)
 #print len(notes[3])
 #print len(notes[4])
 
-print notes[0][33].printNote()
-probMat = makeNoteMatrix(notes)
+#print notes[0][33].printNote()
+#probMat = makeNoteMatrix(notes)
 
 fi = open('test.xml', 'w')
-writeSong(fi, notes)
+#writeSong(fi, notes)
 
 fi.close()
 
-converter.parse('test.xml').show()
+#converter.parse('test.xml').show()
