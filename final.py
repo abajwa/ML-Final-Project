@@ -132,12 +132,6 @@ def writeSong(f, notes):
     newMeasure = 1
   
     for note in part:
-      # a measure is complete when the note count = 1
-      if measureCompletion == 1:
-        f.write('\t\t</measure>\n')
-        measureCompletion = 0
-        measureNumber += 1
-        newMeasure = 1
       if newMeasure == 1:
         f.write('\t\t<!--=======================================================-->\n')
         f.write('\t\t<measure number="' + str(measureNumber) + '">\n')
@@ -152,9 +146,14 @@ def writeSong(f, notes):
         measureCompletion += 0.125
       elif '16th' in note.time:
         measureCompletion += 0.0625
-    f.write('\t\t</part>\n')
+      # a measure is complete when the note count = 1
+      if measureCompletion == 1.0:
+        f.write('\t\t</measure>\n')
+        measureCompletion = 0
+        measureNumber += 1
+        newMeasure = 1
+    f.write('\t\t</measure>\n\t\t</part>\n')
     partNumber += 1
-  f.write('\t</measure>\n')
   f.write('</score-partwise>')
   
 def readFile(f):
