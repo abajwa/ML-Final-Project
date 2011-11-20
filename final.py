@@ -201,7 +201,7 @@ def readFile(f):
       i = i+1
       # add the note to the list of notes
       if i < len(f):
-          part.append(Note(step, octave, time, alter))
+          part.append(Note(step, octave, duration, time, alter))
   noteList.append(part)
   return noteList
 
@@ -221,6 +221,7 @@ notes = readFile(f)
 #print len(notes[3])
 #print len(notes[4])
 
+print notes[0][33].printNote()
 probMat = makeNoteMatrix(notes)
 
 fi = open('test.xml', 'w')

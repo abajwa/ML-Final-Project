@@ -1,7 +1,8 @@
 class Note:
-  def __init__(self, note, octave, time='quarter', alter=0):
+  def __init__(self, note, octave, duration, time='quarter', alter=0):
     self.note = note
     self.octave = octave
+    self.duration = duration
     self.time = time
     self.alter = alter
 
@@ -20,7 +21,8 @@ class Note:
       output +=   "\t\t\t\t\t<octave>" + str(self.octave) + "</octave>\n" + \
                 "\t\t\t\t</pitch>\n"
 
-    output +="\t\t\t\t<voice>1</voice>\n" + \
+    output += "\t\t\t\t<duration>" + str(self.duration) + "</duration>\n" + \
+              "\t\t\t\t<voice>1</voice>\n" + \
               "\t\t\t\t<type>" + str(self.time) + "</type>\n" + \
               "\t\t\t</note>\n"
                                 
