@@ -165,7 +165,7 @@ def writeSong(f, notes):
 def readFile(f):
   noteList = []
   i = 0
-
+  
   # finds where the first part starts - skips all the other part id stuff at the beginning of the xml file
   while i < len(f) and not '<part id=' in f[i]:
     i += 1
@@ -227,6 +227,7 @@ notes = readFile(f)
 #print len(notes[3])
 #print len(notes[4])
 
+print notes[0][33].printNote()
 probMat = makeNoteMatrix(notes)
 
 fi = open('test.xml', 'w')
