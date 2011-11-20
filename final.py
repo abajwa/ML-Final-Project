@@ -1,4 +1,4 @@
-#from music21 import *
+from music21 import *
 from Note import *
 
 #<score-partwise>
@@ -192,15 +192,15 @@ def readFile(f):
       # get the above attributes for each note while /note is not yet encountered
       while i < len(f) -1 and not '/note' in f[i]:
           i += 1
-          if 'step' in f[i]:
+          if '<step' in f[i]:
               step = f[i].split('>')[1].split('<')[0]
-          elif 'alter' in f[i]:
+          elif '<alter' in f[i]:
               alter = f[i].split('>')[1].split('<')[0]
-          elif 'octave' in f[i]:
+          elif '<octave' in f[i]:
               octave = f[i].split('>')[1].split('<')[0]
-          elif 'type' in f[i]:
+          elif '<type' in f[i]:
               time = f[i].split('>')[1].split('<')[0]
-          elif 'duration' in f[i]:
+          elif '<duration' in f[i]:
               duration = f[i].split('>')[1].split('<')[0]
       # increment the row number one more time to skip the /note line since it is the current
       # line at this point
@@ -235,4 +235,4 @@ writeSong(fi, notes)
 
 fi.close()
 
-#converter.parse('test.xml').show()
+converter.parse('test.xml').show()
