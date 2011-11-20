@@ -1,4 +1,4 @@
-#from music21 import *
+from music21 import *
 from Note import *
 
 #<score-partwise>
@@ -130,7 +130,7 @@ def writeSong(f, notes):
     measureNumber = 1
     measureCompletion = 0
     newMeasure = 1
-  
+    part.pop(0)
     for note in part:
       if newMeasure == 1:
         f.write('\t\t<!--=======================================================-->\n')
@@ -146,13 +146,19 @@ def writeSong(f, notes):
         measureCompletion += 0.125
       elif '16th' in note.time:
         measureCompletion += 0.0625
+      elif 'whole' in note.time:
+      	measureCompletion += 1.0
+      elif 'half' in note.time:
+        measureCompletion += 0.5
       # a measure is complete when the note count = 1
-      if measureCompletion == 1.0:
+      if measureCompletion >= 1.0:
         f.write('\t\t</measure>\n')
         measureCompletion = 0
         measureNumber += 1
         newMeasure = 1
-    f.write('\t\t</measure>\n\t\t</part>\n')
+    if measureCompletion != 0:
+    	f.write('\t\t</measure>\n')
+    f.write('\t</part>\n')
     partNumber += 1
   f.write('</score-partwise>')
   
@@ -227,3 +233,5 @@ fi = open('test.xml', 'w')
 writeSong(fi, notes)
 
 fi.close()
+
+converter.parse('test.xml').show()
