@@ -76,7 +76,7 @@ def getTimeSignature(f):
 
 def writeTop(f):
   # list of the labels of each part in the midi file
-  parts = ["Soprano", "Alto", "Tenor", "Bass"]
+  parts = ["Horn 2", "Soprano", "Alto", "Tenor", "Bass"]
 
   # prints out the data for each part
   f.write('<score-partwise>\n' + \
