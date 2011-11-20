@@ -29,16 +29,17 @@ from Note import *
       #<duration>1,2,4,8,16
       #<voice>1</
       #<type>quarter|eighth|16th
-'''
+
 def makeNoteMatrix(parts):
   nm = [ [0 for i in range(0,57)] for j in range(0,57) ]
   noteCount = [0 for i in range(0,57)]
   for part in parts:
-  	nm[0][noteIndex(part[0].note,part[0].octave)] = nm[0][noteIndex(part[0].note,part[0].octave)] + 1
+  	notes = part.getNotes()
+  	nm[0][noteIndex(notes[0].note,notes[0].octave)] += 1
   	noteCount[0] = noteCount[0] + 1
-  	for i in range(1,len(part)):
-  		nm[noteIndex(part[i-1].note,part[i-1].octave)][noteIndex(part[i].note,part[i].octave)] = nm[noteIndex(part[i-1].note,part[i-1].octave)][noteIndex(part[i].note,part[i].octave)] + 1
-  		noteCount[noteIndex(part[i].note,part[i].octave)] = noteCount[noteIndex(part[i].note,part[i].octave)] + 1
+  	for i in range(1,len(notes)):
+  		nm[noteIndex(notes[i-1].note,notes[i-1].octave)][noteIndex(notes[i].note,notes[i].octave)] += 1
+  		noteCount[noteIndex(notes[i].note,notes[i].octave)] += 1
   numNotes = sum(noteCount)
   for i in range(0,57):
   	for j in range(0,57):
@@ -47,7 +48,7 @@ def makeNoteMatrix(parts):
   		if j != 0:
   			nm[i][j] = nm[i][j-1] + nm[i][j]
   return nm
-'''
+
 def noteIndex(note, octave):
   if note == 'R':
     return 0
@@ -246,7 +247,7 @@ ts = getTimeSignature(f)
 
 song = readFile(f)
 
-#probMat = makeNoteMatrix(notes)
+probMat = makeNoteMatrix(song.parts)
 
 fi = open('test.xml', 'w')
 fi.write(song.printScore())

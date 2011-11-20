@@ -8,7 +8,7 @@ class Measure:
 
         def printMeasure(self):
                 if self.number != 0:
-                        output = "\t\t<measure number=\"" + str(number) + "\">\n"
+                        output = "\t\t<measure number=\"" + str(self.number) + "\">\n"
                 else:
                         output = "\t\t<measure implicit=\"yes\" number=\"0\">\n"
                         output +='\t\t<measure number="0">\n'
