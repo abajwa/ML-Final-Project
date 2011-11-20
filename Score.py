@@ -11,3 +11,9 @@ class Score:
 		for part in self.parts:
 			output += part.printPart()
 		output += '</score-partwise>\n'
+
+	def getNotes(self):
+		notes = []
+		for part in self.parts:
+			notes += part.getNotes()
+		return notes

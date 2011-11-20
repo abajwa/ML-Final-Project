@@ -24,3 +24,9 @@ class Part:
 			output += measure.printMeasure()
 		output +='\t</part>\n"
 		return output
+
+	def getNotes(self):
+		notes = []
+		for measure in self.measures:
+			notes += measure.notes
+		return notes
