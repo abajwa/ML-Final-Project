@@ -244,20 +244,12 @@ ts = getTimeSignature(f)
 
 #print ts
 
-notes = readFile(f)
+song = readFile(f)
 
-# prints the number of notes in each part
-#print len(notes[0])
-#print len(notes[1])
-#print len(notes[2])
-#print len(notes[3])
-#print len(notes[4])
-
-#print notes[0][33].printNote()
 #probMat = makeNoteMatrix(notes)
 
 fi = open('test.xml', 'w')
-#writeSong(fi, notes)
+fi.write(song.printScore())
 
 fi.close()
 

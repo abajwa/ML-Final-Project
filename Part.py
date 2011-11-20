@@ -23,7 +23,7 @@ class Part:
 
      def writePart(self):
           output = '\t<part id="P' + str(self.number) +'">\n'
-          for measure in measures:
+          for measure in self.measures:
                output += measure.printMeasure()
           output +='\t</part>\n'
           return output

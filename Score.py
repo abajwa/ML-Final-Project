@@ -6,10 +6,10 @@ class Score:
 		output = '<score-partwise>\n'
 		output += '\t<part-list>\n'
 		for part in self.parts:
-			output += part.printPartList()
+			output += part.writePartList()
 		output += '\t</part-list>\n'
 		for part in self.parts:
-			output += part.printPart()
+			output += part.writePart()
 		output += '</score-partwise>\n'
 
 	def getNotes(self):
