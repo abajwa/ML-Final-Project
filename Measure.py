@@ -11,7 +11,6 @@ class Measure:
                         output = "\t\t<measure number=\"" + str(self.number) + "\">\n"
                 else:
                         output = "\t\t<measure implicit=\"yes\" number=\"0\">\n"
-                        output +='\t\t<measure number="0">\n'
                         output +='\t\t\t<attributes>\n'
                         output +='\t\t\t\t<divisions>4</divisions>\n'
                         output +='\t\t\t\t<key>\n'
@@ -27,4 +26,5 @@ class Measure:
                 for note in self.notes:
                         output += note.printNote()
                 output += "\t\t</measure>\n"
+                output += "\t\t<!--=======================================================-->\n"
                 return output

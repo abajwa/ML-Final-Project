@@ -3,6 +3,8 @@ from Score import *
 from Part import *
 from Measure import *
 from Note import *
+from random import *
+import os
 
 #<score-partwise>
 #<movement-title></movement-title>
@@ -31,23 +33,46 @@ from Note import *
       #<type>quarter|eighth|16th
 
 def makeNoteMatrix(parts):
-  nm = [ [0 for i in range(0,57)] for j in range(0,57) ]
-  noteCount = [0 for i in range(0,57)]
+  nm = [ [0 for i in range(0,57)] ]
+  for i in range(0,56):
+    tm = [0]
+    for j in range(0,8):
+      if i/7 == j:
+        tm += [2 for x in range(0,7)]
+      elif abs(i/7-j) == 1:
+        tm += [1 for x in range(0,7)]
+      else:
+        tm += [0 for x in range(0,7)]
+    nm.append(tm)
   for part in parts:
-  	notes = part.getNotes()
-  	nm[0][noteIndex(notes[0].note,notes[0].octave)] += 1
-  	noteCount[0] = noteCount[0] + 1
-  	for i in range(1,len(notes)):
-  		nm[noteIndex(notes[i-1].note,notes[i-1].octave)][noteIndex(notes[i].note,notes[i].octave)] += 1
-  		noteCount[noteIndex(notes[i].note,notes[i].octave)] += 1
-  numNotes = sum(noteCount)
+    notes = part.getNotes()
+    nm[0][noteIndex(notes[0].note,notes[0].octave)] += 10
+    for i in range(1,len(notes)):
+      	nm[noteIndex(notes[i-1].note,notes[i-1].octave)][noteIndex(notes[i].note,notes[i].octave)] += 10
   for i in range(0,57):
-  	for j in range(0,57):
-  		if noteCount[i] != 0:
-	  		nm[i][j] = float(nm[i][j])/noteCount[i]
-  		if j != 0:
-  			nm[i][j] = nm[i][j-1] + nm[i][j]
+    count = sum(nm[i])
+    print 'Count:',count
+    for j in range(0,57):
+      if count != 0:
+        nm[i][j] = float(nm[i][j])/count
+      if j != 0:
+        nm[i][j] += nm[i][j-1]
   return nm
+
+def makeTimeMatrix(parts):
+  tm = [ [1 for i in range(0,5)] for j in range(0,5)]
+  for part in parts:
+    notes = part.getNotes()
+    for i in range(1,len(notes)):
+      tm[timeIndex(notes[i-1].time)][timeIndex(notes[i].time)] += 10
+    for i in range(0,5):
+      count = sum(tm[i])
+      for j in range(0,5):
+        if count != 0:
+          tm[i][j] = float(tm[i][j])/count
+        if j != 0:
+          tm[i][j] += tm[i][j-1]
+  return tm
 
 def noteIndex(note, octave):
   if note == 'R':
@@ -67,6 +92,62 @@ def noteIndex(note, octave):
   elif note == 'G':
     return 7 + (int(octave)-1)*7
 
+def indexToNote(index):
+  if index == 0:
+    return Note('R', 0)
+  elif index%7 == 1:
+    n = 'A'
+  elif index%7 == 2:
+    n = 'B'
+  elif index%7 == 3:
+    n = 'C'
+  elif index%7 == 4:
+    n = 'D'
+  elif index%7 == 5:
+    n = 'E'
+  elif index%7 == 6:
+    n = 'F'
+  elif index%7 == 0:
+    n = 'G'
+  o = (index-1)/7 + 1
+  return Note(n,o)
+
+def timeIndex(time):
+  if time == '16th':
+    return 0
+  if time == 'eighth':
+    return 1
+  if time == 'quarter':
+    return 2
+  if time == 'half':
+    return 3
+  if time == 'whole':
+    return 4
+
+def indexToTime(index):
+  if index == 0:
+    return '16th'
+  if index == 1:
+    return 'eighth'
+  if index == 2:
+    return 'quarter'
+  if index == 3:
+    return 'half'
+  if index == 4:
+    return 'whole'
+
+def timeToDecimal(time):
+  if time == '16th':
+    return 1.0/16.0
+  if time == 'eighth':
+    return 1.0/8.0
+  if time == 'quarter':
+    return .25
+  if time == 'half':
+    return .5
+  if time == 'whole':
+    return 1.0
+
 def getTimeSignature(f):
   i=0
   while not 'time' in f[i]:
@@ -77,95 +158,6 @@ def getTimeSignature(f):
   beatType = f[i].split('>')[1].split('<')[0]
     
   return [beats, beatType]
-
-def writeTop(f):
-  # list of the labels of each part in the midi file
-  parts = ["Horn 2", "Soprano", "Alto", "Tenor", "Bass"]
-
-  # prints out the data for each part
-  f.write('<score-partwise>\n' + \
-            '\t<part-list>\n');
-
-  i = 1
-  for part in parts:
-    f.write('\t\t<score-part id="P' + str(i) + '">\n' \
-              '\t\t\t<part-name>' + part + '</part-name>\n' + \
-              '\t\t\t<part-abbreviation>' + part[0] + '</part-abbreviation>\n' + \
-              '\t\t\t<score-instrument id="P' + str(i) + '-I' + str(i) + '">\n' + \
-                '\t\t\t\t<instrument-name>Instrument ' + str(i) + '</instrument-name>\n' + \
-              '\t\t\t</score-instrument>\n' + \
-              '\t\t\t<midi-instrument id="P' + str(i) + '-I' + str(i) + '">\n' + \
-                '\t\t\t\t<midi-channel>' + str(i) + '</midi-channel>\n' + \
-                '\t\t\t\t<midi-program>1</midi-program>\n' + \
-              '\t\t\t</midi-instrument>\n' + \
-            '\t\t</score-part>\n')
-    i += 1
-    
-  f.write('\t</part-list>\n')
-
-
-# writes a whole song to an xml file given the file and a list of notes
-def writeSong(f, notes):
-  writeTop(f)
-
-  measureNumber = 1
-  measureCompletion = 0
-  partNumber = 1
-  newMeasure = 1
-  # for each part
-  for part in notes:
-    f.write('\t<part id ="P' + str(partNumber) + '">\n')
-    measureNumber = 1
-    f.write( '\t\t<measure number="0">\n' + \
-                '\t\t\t<attributes>\n' + \
-                  '\t\t\t\t<divisions>4</divisions>\n' + \
-                  '\t\t\t\t<key>\n' + \
-                    '\t\t\t\t\t<fifths>-1</fifths>\n' + \
-                    '\t\t\t\t\t<mode>major</mode>\n' + \
-                  '\t\t\t\t</key>\n' + \
-                  '\t\t\t\t<time symbol="common">\n' + \
-                    '\t\t\t\t\t<beats>4</beats>\n' + \
-                    '\t\t\t\t\t<beat-type>4</beat-type>\n' + \
-                  '\t\t\t\t</time>\n' + \
-             '\t\t\t</attributes>\n' + \
-             '\t\t\t<sound tempo="76"/>\n' + \
-           '\t\t</measure>\n')
-
-    measureNumber = 1
-    measureCompletion = 0
-    newMeasure = 1
-    part.pop(0)
-    for note in part:
-      if newMeasure == 1:
-        f.write('\t\t<!--=======================================================-->\n')
-        f.write('\t\t<measure number="' + str(measureNumber) + '">\n')
-        newMeasure = 0
-
-      f.write(note.printNote() + '\n')
-
-      # adds to the measure completion depending on the note type
-      if 'quarter' in note.time:
-        measureCompletion += 0.25
-      elif 'eighth' in note.time:
-        measureCompletion += 0.125
-      elif '16th' in note.time:
-        measureCompletion += 0.0625
-      elif 'whole' in note.time:
-      	measureCompletion += 1.0
-      elif 'half' in note.time:
-        measureCompletion += 0.5
-      # a measure is complete when the note count = 1
-      if measureCompletion >= 1.0:
-        f.write('\t\t</measure>\n')
-        measureCompletion = 0
-        measureNumber += 1
-        newMeasure = 1
-    if measureCompletion != 0:
-    	f.write('\t\t</measure>\n')
-    f.write('\t</part>\n')
-    partNumber += 1
-  f.write('</score-partwise>')
-
 
 def readFile(f):
   partsList = []
@@ -238,6 +230,43 @@ def readFile(f):
 
   return Score(partsList)
 
+def getRandomNote(pMatNote,pMatTime, prevNote):
+  r = random()
+  pi = noteIndex(prevNote.note, prevNote.octave)
+  nextIndex = 0
+  i=0
+  while r > pMatNote[pi][i] and i < 56:
+    i += 1
+  nextNote = indexToNote(i)
+  r = random()
+  pi = timeIndex(prevNote.time)
+  i=0
+  while r > pMatTime[pi][i] and i < 4:
+    i += 1
+  nextNote.time = indexToTime(i)
+  return nextNote
+
+def startingNote(part):
+  return randint(14*part+1, 14*(part+1)+1)
+
+def makeScore(pMatNote,pMatTime):
+  parts = []
+  for i in range(0,4):
+    nn = indexToNote( startingNote(i) )
+    print nn.note,nn.octave
+    measures = []
+    for j in range(0,30):
+      measure = Measure(j, [])
+      noteTime = 0.0
+      while noteTime < 1.0:
+        nn = getRandomNote(pMatNote,pMatTime,nn)
+        if timeToDecimal(nn.time)+noteTime <= 1.0:
+          measure.addNote(nn)
+          noteTime += timeToDecimal(nn.time)
+      measures.append(measure)
+    parts.append(Part(i,'Instrument '+str(i),measures))
+  return Score(parts)
+
 
 f = open('blah.xml').readlines()
 
@@ -247,11 +276,24 @@ ts = getTimeSignature(f)
 
 song = readFile(f)
 
-probMat = makeNoteMatrix(song.parts)
+parts = []
+path = 'music/'
+files = os.listdir(path)
+for file in files:
+  song = readFile(file)
+  parts += song.parts
+
+probMat = makeNoteMatrix(parts)
+timeMat = makeTimeMatrix(parts)
+
+#print probMat
+
+song = makeScore(probMat, timeMat)
 
 fi = open('test.xml', 'w')
 fi.write(song.printScore())
 
 fi.close()
 
-#converter.parse('test.xml').show()
+from music21 import converter
+converter.parse('test.xml').show()
