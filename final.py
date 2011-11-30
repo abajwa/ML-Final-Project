@@ -263,21 +263,20 @@ def startingNote(part,numParts):
 
 def makeScore(pMatNote,pMatTime,numParts=4,numMeasures=30):
   parts = []
-  nn = indexToNote( startingNote(i,numParts) )
-  #print nn.note,nn.octave
-  measures = []
-  for j in range(0,numMeasures):
-    measure = Measure(j, [])
-    noteTime = 0.0
-    while noteTime < 1.0:
-      nn = getRandomNote(pMatNote,pMatTime,nn)
-      if timeToDecimal(nn.time)+noteTime <= 1.0:
-        measure.addNote(nn)
-        noteTime += timeToDecimal(nn.time)
-    measures.append(measure)
-  parts.append(Part(i,'Instrument '+str(i),measures))
-  for i in range(0, numParts-1):
-    #Make more parts here
+  for i in range(0,numParts):
+    nn = indexToNote( startingNote(i,numParts) )
+    #print nn.note,nn.octave
+    measures = []
+    for j in range(0,numMeasures):
+      measure = Measure(j, [])
+      noteTime = 0.0
+      while noteTime < 1.0:
+        nn = getRandomNote(pMatNote,pMatTime,nn)
+        if timeToDecimal(nn.time)+noteTime <= 1.0:
+          measure.addNote(nn)
+          noteTime += timeToDecimal(nn.time)
+      measures.append(measure)
+    parts.append(Part(i,'Instrument '+str(i),measures))
   return Score(parts)
 
 
