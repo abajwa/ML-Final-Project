@@ -31,7 +31,7 @@ import os, sys
       #<duration>1,2,4,8,16
       #<voice>1</
       #<type>quarter|eighth|16th
-
+########################################################################################################
 def makeNoteMatrix(parts):
   nm = [ [0 for i in range(0,57)] ]
   for i in range(0,56):
@@ -58,6 +58,7 @@ def makeNoteMatrix(parts):
         nm[i][j] += nm[i][j-1]
   return nm
 
+########################################################################################################
 def makeTimeMatrix(parts):
   tm = [ [1 for i in range(0,5)] for j in range(0,5)]
   for part in parts:
@@ -73,6 +74,7 @@ def makeTimeMatrix(parts):
           tm[i][j] += tm[i][j-1]
   return tm
 
+########################################################################################################
 def noteIndex(note, octave):
   if note == 'R':
     return 0
@@ -91,6 +93,7 @@ def noteIndex(note, octave):
   elif note == 'G':
     return 7 + (int(octave)-1)*7
 
+########################################################################################################
 def indexToNote(index):
   if index == 0:
     return Note('R', 0)
@@ -111,6 +114,7 @@ def indexToNote(index):
   o = (index-1)/7 + 1
   return Note(n,o)
 
+########################################################################################################
 def timeIndex(time):
   if time == '16th':
     return 0
@@ -123,6 +127,7 @@ def timeIndex(time):
   if time == 'whole':
     return 4
 
+########################################################################################################
 def indexToTime(index):
   if index == 0:
     return '16th'
@@ -135,6 +140,7 @@ def indexToTime(index):
   if index == 4:
     return 'whole'
 
+########################################################################################################
 def timeToDecimal(time):
   if time == '16th':
     return 1.0/16.0
@@ -147,6 +153,7 @@ def timeToDecimal(time):
   if time == 'whole':
     return 1.0
 
+########################################################################################################
 def timeToDuration(time):
   if time == '16th':
     return 1
@@ -159,6 +166,7 @@ def timeToDuration(time):
   if time == 'whole':
     return 16
 
+########################################################################################################
 def getTimeSignature(f):
   i=0
   while not 'time' in f[i]:
@@ -170,6 +178,7 @@ def getTimeSignature(f):
     
   return [beats, beatType]
 
+########################################################################################################
 def readFile(f):
   partsList = []
   i = 0
@@ -241,6 +250,7 @@ def readFile(f):
 
   return Score(partsList)
 
+########################################################################################################
 def getRandomNote(pMatNote,pMatTime, prevNote):
   r = random()
   pi = noteIndex(prevNote.note, prevNote.octave)
@@ -258,9 +268,11 @@ def getRandomNote(pMatNote,pMatTime, prevNote):
   nextNote.duration = timeToDuration(nextNote.time)
   return nextNote
 
+########################################################################################################
 def startingNote(part,numParts):
   return randint(int(56.0/numParts*part), int(56.0/numParts*(part+1)))
 
+########################################################################################################
 def makeScore(pMatNote,pMatTime,numParts=4,numMeasures=30):
   parts = []
   for i in range(0,numParts):
@@ -272,6 +284,11 @@ def makeScore(pMatNote,pMatTime,numParts=4,numMeasures=30):
       noteTime = 0.0
       while noteTime < 1.0:
         nn = getRandomNote(pMatNote,pMatTime,nn)
+
+        # if the part is not the first, generate an acceptable note
+        if i > 0:
+          while not acceptableNote(parts[0][,nn):
+            nn = getRandomNote(pMatNote,pMatTime,nn)
         if timeToDecimal(nn.time)+noteTime <= 1.0:
           measure.addNote(nn)
           noteTime += timeToDecimal(nn.time)
@@ -279,6 +296,14 @@ def makeScore(pMatNote,pMatTime,numParts=4,numMeasures=30):
     parts.append(Part(i,'Instrument '+str(i),measures))
   return Score(parts)
 
+########################################################################################################
+def acceptableNote(note1, note2):
+    n1Index = noteIndex(note1, note1.octave) % 7 
+    n2Index = noteIndex(note2, note2.octave) % 7
+  # The notes are an acceptable combination if:
+    # 1. it is not within 1 note from the other. ex. A and G are not acceptable neither are A and B
+    if (n1Index - n2Index) == 1 or (n2Index - n1Index) == 1:
+      return 0
 
 f = open('blah.xml').readlines()
 
@@ -290,11 +315,11 @@ song = readFile(f)
 
 parts = song.parts
 
-path = 'music/'
-files = os.listdir(path)
-for file in files:
-  song = readFile(file)
-  parts += song.parts
+#path = 'music/'
+#files = os.listdir(path)
+#for file in files:
+#  song = readFile(file)
+#  parts += song.parts
 
 probMat = makeNoteMatrix(parts)
 timeMat = makeTimeMatrix(parts)
@@ -311,5 +336,5 @@ fi.write(song.printScore())
 
 fi.close()
 
-from music21 import converter
-converter.parse(ofile).show()
+#from music21 import converter
+#converter.parse(ofile).show()
