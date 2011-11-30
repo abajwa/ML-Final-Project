@@ -4,7 +4,7 @@ from Part import *
 from Measure import *
 from Note import *
 from random import *
-import os
+import os, sys
 
 #<score-partwise>
 #<movement-title></movement-title>
@@ -51,7 +51,6 @@ def makeNoteMatrix(parts):
       	nm[noteIndex(notes[i-1].note,notes[i-1].octave)][noteIndex(notes[i].note,notes[i].octave)] += 10
   for i in range(0,57):
     count = sum(nm[i])
-    print 'Count:',count
     for j in range(0,57):
       if count != 0:
         nm[i][j] = float(nm[i][j])/count
@@ -147,6 +146,18 @@ def timeToDecimal(time):
     return .5
   if time == 'whole':
     return 1.0
+
+def timeToDuration(time):
+  if time == '16th':
+    return 1
+  if time == 'eighth':
+    return 2
+  if time == 'quarter':
+    return 4
+  if time == 'half':
+    return 8
+  if time == 'whole':
+    return 16
 
 def getTimeSignature(f):
   i=0
@@ -244,27 +255,29 @@ def getRandomNote(pMatNote,pMatTime, prevNote):
   while r > pMatTime[pi][i] and i < 4:
     i += 1
   nextNote.time = indexToTime(i)
+  nextNote.duration = timeToDuration(nextNote.time)
   return nextNote
 
-def startingNote(part):
-  return randint(14*part+1, 14*(part+1)+1)
+def startingNote(part,numParts):
+  return randint(int(56.0/numParts*part), int(56.0/numParts*(part+1)))
 
-def makeScore(pMatNote,pMatTime):
+def makeScore(pMatNote,pMatTime,numParts=4,numMeasures=30):
   parts = []
-  for i in range(0,4):
-    nn = indexToNote( startingNote(i) )
-    print nn.note,nn.octave
-    measures = []
-    for j in range(0,30):
-      measure = Measure(j, [])
-      noteTime = 0.0
-      while noteTime < 1.0:
-        nn = getRandomNote(pMatNote,pMatTime,nn)
-        if timeToDecimal(nn.time)+noteTime <= 1.0:
-          measure.addNote(nn)
-          noteTime += timeToDecimal(nn.time)
-      measures.append(measure)
-    parts.append(Part(i,'Instrument '+str(i),measures))
+  nn = indexToNote( startingNote(i,numParts) )
+  #print nn.note,nn.octave
+  measures = []
+  for j in range(0,numMeasures):
+    measure = Measure(j, [])
+    noteTime = 0.0
+    while noteTime < 1.0:
+      nn = getRandomNote(pMatNote,pMatTime,nn)
+      if timeToDecimal(nn.time)+noteTime <= 1.0:
+        measure.addNote(nn)
+        noteTime += timeToDecimal(nn.time)
+    measures.append(measure)
+  parts.append(Part(i,'Instrument '+str(i),measures))
+  for i in range(0, numParts-1):
+    #Make more parts here
   return Score(parts)
 
 
@@ -276,7 +289,8 @@ ts = getTimeSignature(f)
 
 song = readFile(f)
 
-parts = []
+parts = song.parts
+
 path = 'music/'
 files = os.listdir(path)
 for file in files:
@@ -287,13 +301,16 @@ probMat = makeNoteMatrix(parts)
 timeMat = makeTimeMatrix(parts)
 
 #print probMat
+#print timeMat
 
-song = makeScore(probMat, timeMat)
+song = makeScore(probMat, timeMat, 4)
 
-fi = open('test.xml', 'w')
+ofile = sys.argv[1]
+
+fi = open(ofile, 'w')
 fi.write(song.printScore())
 
 fi.close()
 
 from music21 import converter
-converter.parse('test.xml').show()
+converter.parse(ofile).show()
