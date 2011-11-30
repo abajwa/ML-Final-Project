@@ -287,7 +287,7 @@ def makeScore(pMatNote,pMatTime,numParts=4,numMeasures=30):
 
         # if the part is not the first, generate an acceptable note
         if i > 0:
-          while not acceptableNote(parts[0][,nn):
+          while not acceptableNote(parts,nn,j,noteTime):
             nn = getRandomNote(pMatNote,pMatTime,nn)
         if timeToDecimal(nn.time)+noteTime <= 1.0:
           measure.addNote(nn)
@@ -297,14 +297,30 @@ def makeScore(pMatNote,pMatTime,numParts=4,numMeasures=30):
   return Score(parts)
 
 ########################################################################################################
-def acceptableNote(note1, note2):
-    n1Index = noteIndex(note1, note1.octave) % 7 
-    n2Index = noteIndex(note2, note2.octave) % 7
-  # The notes are an acceptable combination if:
-    # 1. it is not within 1 note from the other. ex. A and G are not acceptable neither are A and B
-    if (n1Index - n2Index) == 1 or (n2Index - n1Index) == 1:
-      return 0
+def acceptableNote(parts, note2, measureNum, noteTime):
+    for part in parts:
+      note1 = getNoteByTime(part,measureNum,noteTime)
+      n1Index = noteIndex(note1.note, note1.octave) % 7 
+      n2Index = noteIndex(note2.note, note2.octave) % 7
+    # The notes are an acceptable combination if:
+      # 1. it is not within 1 note from the other. ex. A and G are not acceptable neither are A and B
+      if (n1Index - n2Index) == 1 or (n2Index - n1Index) == 1:
+        return False
+      # 1a. Because of our indexes, F and G are not seperated by 1, so test for it explicityly
+      if (note1.note == 'F' and note2.note == 'G') or (note1.note == 'G' and note2.note == 'F'):
+        return False
+    return True
 
+########################################################################################################
+def getNoteByTime(part, measureNum, noteTime):
+  notes = part.measures[measureNum].notes
+  nt = 0.0
+  for note in notes:
+    if nt+timeToDecimal(note.time) > noteTime:
+      return note
+  return notes[len(notes)-1]
+
+########################################################################################################
 f = open('blah.xml').readlines()
 
 ts = getTimeSignature(f)
