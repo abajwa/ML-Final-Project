@@ -6,32 +6,9 @@ from Note import *
 from random import *
 import os, sys
 
-#<score-partwise>
-#<movement-title></movement-title>
-#Need <part-list>
-  #Need <score-part>s
-    #<part-name>
-    #<part-abbreviation>
-    #<score-instrument id=P#-I#>
-      #<instrument-name>
-    #<midi-instrument id=P#-I#>
-      #<midi-channel>#
-      #<midi-program>#
-#<part id="P#">
-  #<measure number="#">
-    #<attrivutes>
-    #<time>
-      #<beats>
-      #<beat-type>
-    #<note>
-      #<pitch>
-        #<step>A|B|C|D|E|F|G</step>
-        #<alter>-1|1</alter>
-        #<octave>1-8</octave>
-      #<duration>1,2,4,8,16
-      #<voice>1</
-      #<type>quarter|eighth|16th
+
 ########################################################################################################
+#Creates the cumulative probability matrix to determine note progression
 def makeNoteMatrix(parts):
   nm = [ [0 for i in range(0,57)] ]
   for i in range(0,56):
@@ -59,6 +36,7 @@ def makeNoteMatrix(parts):
   return nm
 
 ########################################################################################################
+#Creates the cumulative probability matrix to determine note time
 def makeTimeMatrix(parts):
   tm = [ [1 for i in range(0,5)] for j in range(0,5)]
   for part in parts:
@@ -75,6 +53,7 @@ def makeTimeMatrix(parts):
   return tm
 
 ########################################################################################################
+#Returns the matrix index of a note given the note and octave
 def noteIndex(note, octave):
   if note == 'R':
     return 0
@@ -94,6 +73,7 @@ def noteIndex(note, octave):
     return 7 + (int(octave)-1)*7
 
 ########################################################################################################
+#Returns a note with the note and octave corresponding to the matrix index.  All other attributes are default
 def indexToNote(index):
   if index == 0:
     return Note('R', 0)
@@ -115,6 +95,7 @@ def indexToNote(index):
   return Note(n,o)
 
 ########################################################################################################
+#Returns the index of a time, given the string of it's time signature
 def timeIndex(time):
   if time == '16th':
     return 0
@@ -128,6 +109,7 @@ def timeIndex(time):
     return 4
 
 ########################################################################################################
+#Returns the string of a time signature, given the matrix index
 def indexToTime(index):
   if index == 0:
     return '16th'
@@ -141,6 +123,7 @@ def indexToTime(index):
     return 'whole'
 
 ########################################################################################################
+#Gives the decimal value of a time signature string
 def timeToDecimal(time):
   if time == '16th':
     return 1.0/16.0
@@ -154,6 +137,7 @@ def timeToDecimal(time):
     return 1.0
 
 ########################################################################################################
+#Returns the duration for the XML file, given the time signature string
 def timeToDuration(time):
   if time == '16th':
     return 1
@@ -167,6 +151,7 @@ def timeToDuration(time):
     return 16
 
 ########################################################################################################
+#Reads the time signature from file
 def getTimeSignature(f):
   i=0
   while not 'time' in f[i]:
@@ -179,6 +164,7 @@ def getTimeSignature(f):
   return [beats, beatType]
 
 ########################################################################################################
+#Reads in sequences of notes from file, and creates a score that represents the file
 def readFile(f):
   partsList = []
   i = 0
@@ -251,6 +237,7 @@ def readFile(f):
   return Score(partsList)
 
 ########################################################################################################
+#Picks a random note based on the previous note, and the built probability matrix
 def getRandomNote(pMatNote,pMatTime, prevNote):
   r = random()
   pi = noteIndex(prevNote.note, prevNote.octave)
@@ -269,34 +256,58 @@ def getRandomNote(pMatNote,pMatTime, prevNote):
   return nextNote
 
 ########################################################################################################
-def startingNote(part,numParts):
+#Returns the tonal note for each part.  Hard coded to be the tonal for F major
+def tonal(part,numParts):
+  if part == 0:
+    return noteIndex('F', randint(3,6))
+  elif part == 1:
+    return noteIndex('A', randint(2,5))
+  elif part == 2:
+    return noteIndex('C', randint(4,7))
   return randint(int(56.0/numParts*part), int(56.0/numParts*(part+1)))
 
 ########################################################################################################
+#Returns the leading note for each part.  Hard coded to be the leading note for F major
+def leadingNote(part,numParts):
+  if part == 0:
+    return noteIndex('E', randint(3,6))
+  elif part == 1:
+    return noteIndex('B', randint(2,5))
+  elif part == 2:
+    return noteIndex('C', randint(4,7))
+  return randint(int(56.0/numParts*part), int(56.0/numParts*(part+1)))
+
+########################################################################################################
+#Creates a new score from the generated probability matrices
 def makeScore(pMatNote,pMatTime,numParts=4,numMeasures=30):
   parts = []
   for i in range(0,numParts):
-    nn = indexToNote( startingNote(i,numParts) )
+    nn = indexToNote( tonal(i,numParts) )
     #print nn.note,nn.octave
     measures = []
     for j in range(0,numMeasures):
       measure = Measure(j, [])
       noteTime = 0.0
       while noteTime < 1.0:
-        nn = getRandomNote(pMatNote,pMatTime,nn)
-
         # if the part is not the first, generate an acceptable note
         if i > 0:
           while not acceptableNote(parts,nn,j,noteTime):
             nn = getRandomNote(pMatNote,pMatTime,nn)
+        if j == numMeasures-1:
+          nn.time = 'quarter'
         if timeToDecimal(nn.time)+noteTime <= 1.0:
           measure.addNote(nn)
           noteTime += timeToDecimal(nn.time)
+        nn = getRandomNote(pMatNote,pMatTime,nn)
       measures.append(measure)
+    mNotes = measures[numMeasures-1].notes
+    mNotes[len(mNotes)-2] = indexToNote(leadingNote(i,numParts))
+    mNotes[len(mNotes)-1] = indexToNote(tonal(i,numParts))
     parts.append(Part(i,'Instrument '+str(i),measures))
   return Score(parts)
 
 ########################################################################################################
+#Tests whether the generated note will "sound good" based on all other parts
 def acceptableNote(parts, note2, measureNum, noteTime):
     for part in parts:
       note1 = getNoteByTime(part,measureNum,noteTime)
@@ -312,45 +323,49 @@ def acceptableNote(parts, note2, measureNum, noteTime):
     return True
 
 ########################################################################################################
+#Picks the corresponding note from other parts to check for dissonance.
 def getNoteByTime(part, measureNum, noteTime):
   notes = part.measures[measureNum].notes
   nt = 0.0
   for note in notes:
     if nt+timeToDecimal(note.time) > noteTime:
       return note
+    nt += timeToDecimal(note.time)
   return notes[len(notes)-1]
 
 ########################################################################################################
-f = open('blah.xml').readlines()
+#Main function
+if __name__ == '__main__':
+	f = open('blah.xml').readlines()
 
-ts = getTimeSignature(f)
+	ts = getTimeSignature(f)
 
-#print ts
+	#print ts
 
-song = readFile(f)
+	song = readFile(f)
 
-parts = song.parts
+	parts = song.parts
 
-#path = 'music/'
-#files = os.listdir(path)
-#for file in files:
-#  song = readFile(file)
-#  parts += song.parts
+	path = 'music/'
+	files = os.listdir(path)
+	for file in files:
+	  song = readFile(file)
+	  parts += song.parts
 
-probMat = makeNoteMatrix(parts)
-timeMat = makeTimeMatrix(parts)
+	probMat = makeNoteMatrix(parts)
+	timeMat = makeTimeMatrix(parts)
 
-#print probMat
-#print timeMat
+	#print probMat
+	#print timeMat
 
-song = makeScore(probMat, timeMat, 4)
+	song = makeScore(probMat, timeMat, 4)
 
-ofile = sys.argv[1]
+	ofile = sys.argv[1]
 
-fi = open(ofile, 'w')
-fi.write(song.printScore())
+	fi = open(ofile, 'w')
+	fi.write(song.printScore())
 
-fi.close()
+	fi.close()
 
-#from music21 import converter
-#converter.parse(ofile).show()
+	#from music21 import converter
+	#converter.parse(ofile).show()
