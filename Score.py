@@ -1,7 +1,8 @@
 class Score:
 	def __init__(self, parts):
 		self.parts = parts
-
+	
+	# prints out the MusicXML encoding for the score
 	def printScore(self):
 		output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		output += "<!DOCTYPE score-partwise PUBLIC \"-//Recordare//DTD MusicXML 1.1 Partwise//EN\""
@@ -16,6 +17,7 @@ class Score:
 		output += '</score-partwise>\n'
 		return output
 
+	# returns the notes for the score
 	def getNotes(self):
 		notes = []
 		for part in self.parts:

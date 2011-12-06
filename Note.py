@@ -7,7 +7,7 @@ class Note:
     self.alter = alter
     self.duration = duration
 
-  # prints out the xml encoding for the note
+  # prints out the MusicXML encoding for the note
   def printNote(self):
     output = "\t\t\t<note>\n"
 

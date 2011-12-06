@@ -7,6 +7,7 @@ class Part:
 	def addMeasure(self, measure):
 		self.measures.append(measure)
 
+	# writes out the MusicXML code for a part definition
 	def writePartList(self):
 		output = '\t\t<score-part id="P' + str(self.number) + '">\n'
 		output +='\t\t\t<part-name>' + self.part + '</part-name>\n'
@@ -21,13 +22,15 @@ class Part:
 		output +='\t\t</score-part>\n'
 		return output
 
+	# writes out the MusicXML for the measures and notes for the part
 	def writePart(self):
 		output = '\t<part id="P' + str(self.number) +'">\n'
 		for measure in self.measures:
 			output += measure.printMeasure()
 		output +='\t</part>\n'
 		return output
-
+	
+	# returns the notes for the current part
 	def getNotes(self):
 		notes = []
 		for measure in self.measures:
