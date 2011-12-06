@@ -227,13 +227,6 @@ def readFile(f):
       
     i += 1
 
-#  print i
-#  print "PART NUM: " + str(partNum)
-
-#  print "Measures in part 1: " + str(len(partsList[0].measures))
-#  print "Notes in part 2 measure 1: " + str(len(partsList[4].measures[20].notes))
-  #print partsList[0].measures[0].notes[0].printNote()
-
   return Score(partsList)
 
 ########################################################################################################
